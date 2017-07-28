@@ -1,0 +1,11 @@
+cannabis
+abuse
+crack
+damn
+drunk
+grass
+restrictedword1
+restrictedword2
+invalidWord
+testWord
+anotherTest

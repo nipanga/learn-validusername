@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+		                   http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context/spring-context-4.3.xsd
+                           http://www.springframework.org/schema/data/jpa
+                           http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <context:annotation-config />
+
+
+
+    <!-- ### DAOS ### -->
+    <jpa:repositories base-package="com.learn.springboot.validusername.repositories" />
+
+    <!-- ### SERVICES ### -->
+    <alias name="defaultUserService" alias="userService" />
+    <bean id="defaultUserService" class="com.learn.springboot.validusername.services.impl.DefaultUserService">
+        <property name="wordSuggestionService" ref="wordSuggestionService" />
+        <property name="userRepository" ref="userRepository" />
+        <property name="userValidator" ref="baseUserValidator" />
+    </bean>
+
+    <alias name="defaultWordSuggestionService" alias="wordSuggestionService" />
+    <bean id="defaultWordSuggestionService"
+        class="com.learn.springboot.validusername.services.impl.DefaultWordSuggestionService">
+        <property name="environment" ref="environment" />
+        <property name="strategies" ref="usernameSuggestionStrategies" />
+    </bean>
+
+
+    <!-- ### VALIDATORS ### -->
+    <bean id="baseUserValidator" class="com.learn.springboot.validusername.validators.AbstractBaseValidator">
+        <property name="validators" ref="userValidatorList" />
+    </bean>
+
+    <bean id="userValidator" class="com.learn.springboot.validusername.validators.impl.UsernameValidator" />
+
+
+    <!-- ### STRATEGIES ### -->
+    <alias name="defaultDuplicateUsernameGenerateUsernameStrategy" alias="duplicateUsernameGenerateUsernameStrategy" />
+    <bean id="defaultDuplicateUsernameGenerateUsernameStrategy"
+        class="com.learn.springboot.validusername.strategies.impl.DuplicateUsernameGenerateUsernameStrategy" />
+
+    <alias name="defaultConcatenateYearGenerateUsernameStrategy" alias="concatenateYearGenerateUsernameStrategy" />
+    <bean id="defaultConcatenateYearGenerateUsernameStrategy"
+        class="com.learn.springboot.validusername.strategies.impl.ConcatenateYearGenerateUsernameStrategy" />
+
+    <alias name="defaultConcatenateRandomNumbersGenerateUsernameStrategy" alias="concatenateRandomNumbersGenerateUsernameStrategy" />
+    <bean id="defaultConcatenateRandomNumbersGenerateUsernameStrategy"
+        class="com.learn.springboot.validusername.strategies.impl.ConcatenateRandomNumbersGenerateUsernameStrategy" />
+
+    <!-- ### LISTS ### -->
+    <util:list id="userValidatorList">
+        <ref bean="userValidator" />
+    </util:list>
+
+    <util:list id="usernameSuggestionStrategies">
+        <ref bean="duplicateUsernameGenerateUsernameStrategy" />
+        <ref bean="concatenateYearGenerateUsernameStrategy" />
+        <ref bean="concatenateRandomNumbersGenerateUsernameStrategy" />
+    </util:list>
+
+</beans>
