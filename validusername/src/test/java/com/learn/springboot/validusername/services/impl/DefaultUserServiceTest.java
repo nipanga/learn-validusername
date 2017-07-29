@@ -22,6 +22,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.learn.springboot.validusername.TestContextConfiguration;
 import com.learn.springboot.validusername.dto.UserResponseDTO;
+import com.learn.springboot.validusername.exceptions.UserValidationException;
 import com.learn.springboot.validusername.models.UserModel;
 import com.learn.springboot.validusername.repositories.UserRepository;
 import com.learn.springboot.validusername.validators.impl.UsernameValidator;
@@ -120,30 +121,23 @@ public class DefaultUserServiceTest {
     /**
      * 
      */
-    @Test
-    public void test_suggestionList_duplicates() {
-	final String username = "invalidWord";
-	UserResponseDTO response = fixture.isValidUsername(username);
-	List<String> suggestions = response.getSuggestedUsernames();
-	assertFalse(CollectionUtils.isEmpty(suggestions));
-	List<String> distinctSuggestions = suggestions.stream().distinct()
-	        .collect(Collectors.toList());
-	assertEquals("Suggestion should not have duplicates", suggestions.size(),
-	        distinctSuggestions.size());
-    }
-
-
-    /**
-     * 
-     */
     void test_suggestions(final List<String> suggestions) {
 	assertFalse(CollectionUtils.isEmpty(suggestions));
 	final int suggestionsSize = suggestions.size();
 	assertTrue(String.format("Should have from 5 up to 14 suggestions, but has %d",
 	        suggestionsSize), ((5 <= suggestionsSize) && (suggestionsSize <= 14)));
-	for (String s : suggestions) {
-	    assertTrue(String.format("Suggestion %s should have more than 6 chars, but has %d", s,
-	            s.length()), (6 <= s.length()));
+	List<String> distinctSuggestions = suggestions.stream().distinct()
+	        .collect(Collectors.toList());
+	assertEquals("Suggestion should not have duplicates", suggestions.size(),
+	        distinctSuggestions.size());
+	for (String suggestion : suggestions) {
+	    assertTrue(String.format("Suggestion %s should have more than 6 chars, but has %d",
+	            suggestion, suggestion.length()), (6 <= suggestion.length()));
+	    try {
+		this.fixture.checkInvalidWords(suggestion);
+	    } catch (UserValidationException e) {
+		assertTrue("Suggested list should not have invalid words", Boolean.FALSE);
+	    }
 	}
     }
 }
