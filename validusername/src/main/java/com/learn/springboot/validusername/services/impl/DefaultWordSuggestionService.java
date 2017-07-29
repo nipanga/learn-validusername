@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -113,7 +114,7 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
      * 
      * @param input
      *            the input to find a suggested word
-     * @return a list of suggestions based on {@code input}
+     * @return a sorted list of suggestions based on {@code input}
      */
     protected List<String> findSuggestions(final String input) {
 	final int maxSuggestions = Integer.valueOf(
@@ -126,6 +127,7 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
 	    }
 	    suggestions.add(generatedUsername);
 	}
+	suggestions.sort(Comparator.comparing(String::toString));
 	return suggestions;
     }
 
@@ -148,6 +150,7 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
 		return strategy.generate(input);
 	    }
 	}
+	// This is here just for code brevity...
 	int randomNumber = new Random().nextInt(Integer.MAX_VALUE);
 	return input + StringUtils.abbreviate(String.valueOf(randomNumber), 6);
     }
