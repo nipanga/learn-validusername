@@ -1,9 +1,11 @@
 package com.learn.springboot.validusername.services.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
@@ -68,6 +70,18 @@ public class DefaultUserServiceTest {
      * 
      */
     @Test
+    public void test_username_valid() {
+	final String username = "avalidusername";
+	final UserResponseDTO response = fixture.isValidUsername(username);
+	assertTrue(response.isSuccessful());
+	assertTrue(CollectionUtils.isEmpty(response.getSuggestedUsernames()));
+    }
+
+
+    /**
+     * 
+     */
+    @Test
     public void test_invalidUsername_charLength() {
 	final String username = "12345";
 	UserResponseDTO response = fixture.isValidUsername(username);
@@ -103,12 +117,19 @@ public class DefaultUserServiceTest {
     }
 
 
+    /**
+     * 
+     */
     @Test
-    public void test_username_valid() {
-	final String username = "avalidusername";
-	final UserResponseDTO response = fixture.isValidUsername(username);
-	assertTrue(response.isSuccessful());
-	assertTrue(CollectionUtils.isEmpty(response.getSuggestedUsernames()));
+    public void test_suggestionList_duplicates() {
+	final String username = "invalidWord";
+	UserResponseDTO response = fixture.isValidUsername(username);
+	List<String> suggestions = response.getSuggestedUsernames();
+	assertFalse(CollectionUtils.isEmpty(suggestions));
+	List<String> distinctSuggestions = suggestions.stream().distinct()
+	        .collect(Collectors.toList());
+	assertEquals("Suggestion should not have duplicates", suggestions.size(),
+	        distinctSuggestions.size());
     }
 
 
