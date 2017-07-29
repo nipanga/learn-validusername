@@ -3,7 +3,6 @@ package com.learn.springboot.validusername.validators;
 import java.util.Collection;
 
 import com.learn.springboot.validusername.exceptions.UserValidationException;
-import com.learn.springboot.validusername.models.BaseModel;
 
 /**
  * Validates a object according to the injected {@link Validator}s
@@ -11,9 +10,9 @@ import com.learn.springboot.validusername.models.BaseModel;
  * @author felipe
  *
  * @param <T>
- *            the Model to be validated
+ *            the String to be validated
  */
-public class AbstractBaseValidator<T extends BaseModel> implements Validator<T> {
+public class AbstractBaseValidator<T> implements Validator<T> {
 
     private Collection<Validator<T>> validators;
 
