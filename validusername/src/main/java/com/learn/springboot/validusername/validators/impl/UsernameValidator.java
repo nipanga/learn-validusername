@@ -44,14 +44,16 @@ public class UsernameValidator implements Validator<String> {
 
 
     /**
-     * Validates if the username has at least {@link #MIN_CHAR_LENGTH}
+     * Validates if the username has at least
+     * {@link UsernameValidator#MIN_CHAR_LENGTH}
      * 
      * @param username
      *            the object to be validates
      */
     private void validateUsernameLength(String username) throws UserValidationException {
-	if (StringUtils.length(username) < 6) {
-	    throw new UsernameLengthException("username must be at least 6 chars long.");
+	if (StringUtils.length(username) < MIN_CHAR_LENGTH) {
+	    throw new UsernameLengthException(
+	            String.format("username must be at least %d chars long.", MIN_CHAR_LENGTH));
 	}
     }
 }
