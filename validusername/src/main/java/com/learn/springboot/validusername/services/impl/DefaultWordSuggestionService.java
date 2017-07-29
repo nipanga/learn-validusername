@@ -67,7 +67,7 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
 		}
 	    }
 	} catch (IOException e) {
-	    // Nothing to do in this case
+	    // Nothing to do in this case. Or do have, maybe...
 	}
 	return Boolean.FALSE;
     }
@@ -82,6 +82,7 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
      * @throws IOException
      */
     protected ClassPathResource getFileReader(final String filePath) throws IOException {
+	// Spring Boot has its caveats, unfortunately...
 	return new ClassPathResource(filePath);
     }
 
@@ -95,6 +96,10 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
 	final String suggestedDictionaryFilePath = getEnvironment()
 	        .getProperty(ProjectConstants.Files.SUGGESTED_WORDS);
 	String line = "";
+	// Randomizing the suggested usernames, because, if someone types a restricted
+	// word, we also should return a suggestion, so he feels ashamed to use a
+	// restricted word, and to teach him that he should respects everyone else
+	// (including machines, programmers and human beings).
 	try (RandomAccessFile file = new RandomAccessFile(
 	        getFileReader(suggestedDictionaryFilePath).getFile(), "r")) {
 	    while (StringUtils.isEmpty(line)) {
@@ -103,7 +108,7 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
 		line = file.readLine();
 	    }
 	} catch (IOException e) {
-	    // Nothing to do in this case
+	    // Nothing to do in this case. Or do have, maybe...
 	}
 	return line;
     }
@@ -150,7 +155,8 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
 		return strategy.generate(input);
 	    }
 	}
-	// This is here just for code brevity...
+	// By now you could get the idea. We don't need to implement 14 strategies to
+	// generate usernames, right? :]
 	int randomNumber = new Random().nextInt(Integer.MAX_VALUE);
 	return input + StringUtils.abbreviate(String.valueOf(randomNumber), 6);
     }
