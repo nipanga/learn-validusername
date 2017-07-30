@@ -29,6 +29,8 @@
     <bean id="defaultWordSuggestionService" class="com.learn.springboot.validusername.services.impl.DefaultWordSuggestionService">
         <property name="environment" ref="environment" />
         <property name="generateUsernameStrategies" ref="usernameSuggestionStrategies" />
+        <property name="restrictedWordsStrategy" ref="getFromFileRestrictedWordsStrategy" />
+        <property name="suggestedWordsStrategy" ref="randomSuggestionSuggestedWordsStrategy" />
     </bean>
 
 
@@ -56,6 +58,16 @@
     <alias name="defaultConcatenateSequentialNumbersGenerateUsernameStrategy" alias="concatenateSequentialNumbersGenerateUsernameStrategy" />
     <bean id="defaultConcatenateSequentialNumbersGenerateUsernameStrategy"
         class="com.learn.springboot.validusername.strategies.impl.ConcatenateSequentialNumbersGenerateUsernameStrategy" />
+
+    <alias name="defaultGetFromFileRestrictedWordsStrategy" alias="getFromFileRestrictedWordsStrategy" />
+    <bean id="defaultGetFromFileRestrictedWordsStrategy"
+        class="com.learn.springboot.validusername.strategies.impl.GetFromFileRestrictedWordsStrategy">
+        <property name="environment" ref="environment" />
+    </bean>
+
+    <alias name="defaultRandomSuggestionSuggestedWordsStrategy" alias="randomSuggestionSuggestedWordsStrategy" />
+    <bean id="defaultRandomSuggestionSuggestedWordsStrategy"
+        class="com.learn.springboot.validusername.strategies.impl.RandomSuggestionSuggestedWordsStrategy" />
 
 
     <!-- ### LISTS ### -->
