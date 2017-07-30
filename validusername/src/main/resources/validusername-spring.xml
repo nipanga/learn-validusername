@@ -14,7 +14,6 @@
     <context:annotation-config />
 
 
-
     <!-- ### DAOS ### -->
     <jpa:repositories base-package="com.learn.springboot.validusername.repositories" />
 
@@ -27,10 +26,9 @@
     </bean>
 
     <alias name="defaultWordSuggestionService" alias="wordSuggestionService" />
-    <bean id="defaultWordSuggestionService"
-        class="com.learn.springboot.validusername.services.impl.DefaultWordSuggestionService">
+    <bean id="defaultWordSuggestionService" class="com.learn.springboot.validusername.services.impl.DefaultWordSuggestionService">
         <property name="environment" ref="environment" />
-        <property name="strategies" ref="usernameSuggestionStrategies" />
+        <property name="generateUsernameStrategies" ref="usernameSuggestionStrategies" />
     </bean>
 
 
@@ -55,6 +53,11 @@
     <bean id="defaultConcatenateRandomNumbersGenerateUsernameStrategy"
         class="com.learn.springboot.validusername.strategies.impl.ConcatenateRandomNumbersGenerateUsernameStrategy" />
 
+    <alias name="defaultConcatenateSequentialNumbersGenerateUsernameStrategy" alias="concatenateSequentialNumbersGenerateUsernameStrategy" />
+    <bean id="defaultConcatenateSequentialNumbersGenerateUsernameStrategy"
+        class="com.learn.springboot.validusername.strategies.impl.ConcatenateSequentialNumbersGenerateUsernameStrategy" />
+
+
     <!-- ### LISTS ### -->
     <util:list id="userValidatorList">
         <ref bean="userValidator" />
@@ -64,6 +67,7 @@
         <ref bean="duplicateUsernameGenerateUsernameStrategy" />
         <ref bean="concatenateYearGenerateUsernameStrategy" />
         <ref bean="concatenateRandomNumbersGenerateUsernameStrategy" />
+        <ref bean="concatenateSequentialNumbersGenerateUsernameStrategy" />
     </util:list>
 
 </beans>
