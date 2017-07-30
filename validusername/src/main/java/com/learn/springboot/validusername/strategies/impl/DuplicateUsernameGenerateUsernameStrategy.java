@@ -1,5 +1,7 @@
 package com.learn.springboot.validusername.strategies.impl;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.learn.springboot.validusername.strategies.GenerateUsernameStrategy;
 
 /**
@@ -19,6 +21,6 @@ public class DuplicateUsernameGenerateUsernameStrategy implements GenerateUserna
      */
     @Override
     public String generate(String input) {
-	return input + input;
+        return StringUtils.rightPad(input, 6, input);
     }
 }

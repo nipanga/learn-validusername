@@ -2,6 +2,8 @@ package com.learn.springboot.validusername.strategies.impl;
 
 import java.util.GregorianCalendar;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.learn.springboot.validusername.strategies.GenerateUsernameStrategy;
 
 /**
@@ -21,7 +23,7 @@ public class ConcatenateYearGenerateUsernameStrategy implements GenerateUsername
      */
     @Override
     public String generate(String input) {
-	return input
-	        + String.valueOf((GregorianCalendar.getInstance().get(GregorianCalendar.YEAR)));
+        final String result = input + GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
+        return StringUtils.rightPad(input, 12, input);
     }
 }

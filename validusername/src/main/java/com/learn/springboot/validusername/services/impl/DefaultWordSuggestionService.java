@@ -3,13 +3,10 @@ package com.learn.springboot.validusername.services.impl;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
@@ -39,11 +36,11 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
      */
     @Override
     public List<String> suggestWords(final String input) {
-	String word = input;
-	if (isRestricted(input)) {
-	    word = getRandomWordFromDictionary();
-	}
-	return findSuggestions(word);
+        String word = input;
+        if (isRestricted(input)) {
+            word = StringUtils.truncate(input, (input.length() /3));
+        }
+        return findSuggestions(word);
     }
 
 
@@ -56,20 +53,19 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
      *         {@link Boolean#FALSE} otherwise
      */
     public boolean isRestricted(final String input) {
-	final String restrictedWordsFilePath = getEnvironment()
-	        .getProperty(ProjectConstants.Files.RESTRICTED_WORDS);
-	try (BufferedReader reader = new BufferedReader(
-	        new InputStreamReader(getFileReader(restrictedWordsFilePath).getInputStream()))) {
-	    String line = "";
-	    while ((line = reader.readLine()) != null) {
-		if (line.indexOf(input) != -1) {
-		    return Boolean.TRUE;
-		}
-	    }
-	} catch (IOException e) {
-	    // Nothing to do in this case. Or do have, maybe...
-	}
-	return Boolean.FALSE;
+        final String restrictedWordsFilePath = getEnvironment()
+                .getProperty(ProjectConstants.Files.RESTRICTED_WORDS);
+        try (BufferedReader reader = getFileReader(restrictedWordsFilePath)) {
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                if (line.indexOf(input) != -1) {
+                    return Boolean.TRUE;
+                }
+            }
+        } catch (IOException e) {
+            // Nothing to do in this case. Or do have, maybe...
+        }
+        return Boolean.FALSE;
     }
 
 
@@ -81,36 +77,10 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
      * @return ClassPathResource the File
      * @throws IOException
      */
-    protected ClassPathResource getFileReader(final String filePath) throws IOException {
-	// Spring Boot has its caveats, unfortunately...
-	return new ClassPathResource(filePath);
-    }
-
-
-    /**
-     * Gets a random word from a txt dictionary
-     * 
-     * @return a random word from a txt dictionary
-     */
-    protected String getRandomWordFromDictionary() {
-	final String suggestedDictionaryFilePath = getEnvironment()
-	        .getProperty(ProjectConstants.Files.SUGGESTED_WORDS);
-	String line = "";
-	// Randomizing the suggested usernames, because, if someone types a restricted
-	// word, we also should return a suggestion, so he feels ashamed to use a
-	// restricted word, and to teach him that he should respects everyone else
-	// (including machines, programmers and human beings).
-	try (RandomAccessFile file = new RandomAccessFile(
-	        getFileReader(suggestedDictionaryFilePath).getFile(), "r")) {
-	    while (StringUtils.isEmpty(line)) {
-		int randomPos = new Random().nextInt((int) file.length());
-		file.seek(randomPos);
-		line = file.readLine();
-	    }
-	} catch (IOException e) {
-	    // Nothing to do in this case. Or do have, maybe...
-	}
-	return line;
+    protected BufferedReader getFileReader(final String filePath) throws IOException {
+        // Spring Boot has its caveats, unfortunately...
+        return new BufferedReader(
+                new InputStreamReader(new ClassPathResource(filePath).getInputStream()));
     }
 
 
@@ -122,62 +92,38 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
      * @return a sorted list of suggestions based on {@code input}
      */
     protected List<String> findSuggestions(final String input) {
-	final int maxSuggestions = Integer.valueOf(
-	        getEnvironment().getProperty(ProjectConstants.App.USERNAME_MAX_SUGGESTIONS));
-	final List<String> suggestions = new ArrayList<>();
-	for (int i = 0; i < maxSuggestions; i++) {
-	    String generatedUsername = generateUsername(input, true);
-	    while (suggestions.contains(generatedUsername)) {
-		generatedUsername = generateUsername(input, true);
-	    }
-	    suggestions.add(generatedUsername);
-	}
-	suggestions.sort(Comparator.comparing(String::toString));
-	return suggestions;
-    }
-
-
-    /**
-     * Generates a single username, based on {@code input}
-     * 
-     * @param input
-     *            the base word to generate a new username
-     * @param useStrategy
-     *            defines if this method should use the injected strategies to
-     *            generate a new username or not [for code brevity]
-     * @return a new word based on {@code input}
-     */
-    private String generateUsername(final String input, final boolean useStrategy) {
-	if (useStrategy) {
-	    if (CollectionUtils.isNotEmpty(getStrategies())) {
-		int randomNumber = new Random().nextInt(getStrategies().size());
-		GenerateUsernameStrategy strategy = getStrategies().get(randomNumber);
-		return strategy.generate(input);
-	    }
-	}
-	// By now you could get the idea. We don't need to implement 14 strategies to
-	// generate usernames, right? :]
-	int randomNumber = new Random().nextInt(Integer.MAX_VALUE);
-	return input + StringUtils.abbreviate(String.valueOf(randomNumber), 6);
+        final List<String> suggestions = new ArrayList<>();
+        final int maxSuggestions = Integer.valueOf(
+                getEnvironment().getProperty(ProjectConstants.App.USERNAME_MAX_SUGGESTIONS));
+        while (suggestions.size() < maxSuggestions) {
+            for (GenerateUsernameStrategy strategy : getGenerateUsernameStrategies()) {
+                String username = strategy.generate(input);
+                if (!suggestions.contains(username)) {
+                    suggestions.add(username);
+                }
+            }
+        }
+        suggestions.sort(Comparator.comparing(String::toString));
+        return suggestions;
     }
 
 
     protected Environment getEnvironment() {
-	return environment;
+        return environment;
     }
 
 
     public void setEnvironment(Environment environment) {
-	this.environment = environment;
+        this.environment = environment;
     }
 
 
-    protected List<GenerateUsernameStrategy> getStrategies() {
-	return strategies;
+    protected List<GenerateUsernameStrategy> getGenerateUsernameStrategies() {
+        return strategies;
     }
 
 
-    public void setStrategies(List<GenerateUsernameStrategy> strategies) {
-	this.strategies = strategies;
+    public void setGenerateUsernameStrategies(List<GenerateUsernameStrategy> strategies) {
+        this.strategies = strategies;
     }
 }

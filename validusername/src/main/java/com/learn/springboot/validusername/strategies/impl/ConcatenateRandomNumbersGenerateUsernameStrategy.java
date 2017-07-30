@@ -23,7 +23,8 @@ public class ConcatenateRandomNumbersGenerateUsernameStrategy implements Generat
      */
     @Override
     public String generate(String input) {
-	int randomNumber = new Random().nextInt(Integer.MAX_VALUE);
-	return input + StringUtils.abbreviate(String.valueOf(randomNumber), 6);
+        String randomNumber = String.valueOf(new Random().nextInt(99999));
+        final String result = (input + randomNumber);
+        return StringUtils.rightPad(result, 12, result);
     }
 }
