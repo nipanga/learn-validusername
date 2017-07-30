@@ -25,6 +25,6 @@ public class ConcatenateRandomNumbersGenerateUsernameStrategy implements Generat
     public String generate(String input) {
         String randomNumber = String.valueOf(new Random().nextInt(99999));
         final String result = (input + randomNumber);
-        return StringUtils.rightPad(result, 12, result);
+        return StringUtils.rightPad(result, 7, result);
     }
 }

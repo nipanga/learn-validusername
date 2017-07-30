@@ -24,6 +24,6 @@ public class ConcatenateYearGenerateUsernameStrategy implements GenerateUsername
     @Override
     public String generate(String input) {
         final String result = input + GregorianCalendar.getInstance().get(GregorianCalendar.YEAR);
-        return StringUtils.rightPad(input, 12, input);
+        return StringUtils.rightPad(input, 7, input);
     }
 }

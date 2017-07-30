@@ -30,6 +30,6 @@ public class ConcatenateSequentialNumbersGenerateUsernameStrategy
             numberSequence.append(String.valueOf(i));
         }
         final String result = (input + numberSequence.toString());
-        return StringUtils.rightPad(result, 12, result);
+        return StringUtils.rightPad(result, 6, result);
     }
 }
