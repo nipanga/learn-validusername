@@ -56,14 +56,14 @@ public class DefaultUserServiceTest {
      */
     @Before
     public void setUp() {
-	UserModel mockUser = new UserModel();
-	mockUser.setPk(1L);
-	mockUser.setUsername("username");
-	this.wordSuggestionService.setEnvironment(this.environment);
-	this.fixture = new DefaultUserService();
-	this.fixture.setWordSuggestionService(this.wordSuggestionService);
-	this.fixture.setUserRepository(this.userRepository);
-	this.fixture.setUserValidator(new UsernameValidator());
+        UserModel mockUser = new UserModel();
+        mockUser.setPk(1L);
+        mockUser.setUsername("username");
+        this.wordSuggestionService.setEnvironment(this.environment);
+        this.fixture = new DefaultUserService();
+        this.fixture.setWordSuggestionService(this.wordSuggestionService);
+        this.fixture.setUserRepository(this.userRepository);
+        this.fixture.setUserValidator(new UsernameValidator());
     }
 
 
@@ -72,10 +72,10 @@ public class DefaultUserServiceTest {
      */
     @Test
     public void test_username_valid() {
-	final String username = "avalidusername";
-	final UserResponseDTO response = fixture.isValidUsername(username);
-	assertTrue(response.isSuccessful());
-	assertTrue(CollectionUtils.isEmpty(response.getSuggestedUsernames()));
+        final String username = "avalidusername";
+        final UserResponseDTO response = fixture.isValidUsername(username);
+        assertTrue(response.isSuccessful());
+        assertTrue(CollectionUtils.isEmpty(response.getSuggestedUsernames()));
     }
 
 
@@ -83,11 +83,59 @@ public class DefaultUserServiceTest {
      * 
      */
     @Test
-    public void test_invalidUsername_charLength() {
-	final String username = "12345";
-	UserResponseDTO response = fixture.isValidUsername(username);
-	assertFalse(response.isSuccessful());
-	test_suggestions(response.getSuggestedUsernames());
+    public void test_invalidUsername_charLength_1() {
+        final String username = "1";
+        UserResponseDTO response = fixture.isValidUsername(username);
+        assertFalse(response.isSuccessful());
+        test_suggestions(response.getSuggestedUsernames());
+    }
+
+
+    /**
+     * 
+     */
+    @Test
+    public void test_invalidUsername_charLength_2() {
+        final String username = "12";
+        UserResponseDTO response = fixture.isValidUsername(username);
+        assertFalse(response.isSuccessful());
+        test_suggestions(response.getSuggestedUsernames());
+    }
+
+
+    /**
+     * 
+     */
+    @Test
+    public void test_invalidUsername_charLength_3() {
+        final String username = "123";
+        UserResponseDTO response = fixture.isValidUsername(username);
+        assertFalse(response.isSuccessful());
+        test_suggestions(response.getSuggestedUsernames());
+    }
+
+
+    /**
+     * 
+     */
+    @Test
+    public void test_invalidUsername_charLength_4() {
+        final String username = "1234";
+        UserResponseDTO response = fixture.isValidUsername(username);
+        assertFalse(response.isSuccessful());
+        test_suggestions(response.getSuggestedUsernames());
+    }
+
+
+    /**
+     * 
+     */
+    @Test
+    public void test_invalidUsername_charLength_5() {
+        final String username = "12345";
+        UserResponseDTO response = fixture.isValidUsername(username);
+        assertFalse(response.isSuccessful());
+        test_suggestions(response.getSuggestedUsernames());
     }
 
 
@@ -96,13 +144,13 @@ public class DefaultUserServiceTest {
      */
     @Test
     public void test_invalidUsername_alreadyExists() {
-	UserModel testUser = new UserModel();
-	testUser.setUsername("username");
-	fixture.save(testUser);
-	final String username = "username";
-	UserResponseDTO response = fixture.isValidUsername(username);
-	assertFalse(response.isSuccessful());
-	test_suggestions(response.getSuggestedUsernames());
+        UserModel testUser = new UserModel();
+        testUser.setUsername("username");
+        fixture.save(testUser);
+        final String username = "username";
+        UserResponseDTO response = fixture.isValidUsername(username);
+        assertFalse(response.isSuccessful());
+        test_suggestions(response.getSuggestedUsernames());
     }
 
 
@@ -111,10 +159,10 @@ public class DefaultUserServiceTest {
      */
     @Test
     public void test_username_invalid_restrictedWords() {
-	final String username = "invalidWord";
-	final UserResponseDTO response = fixture.isValidUsername(username);
-	assertFalse(response.isSuccessful());
-	test_suggestions(response.getSuggestedUsernames());
+        final String username = "invalidWord";
+        final UserResponseDTO response = fixture.isValidUsername(username);
+        assertFalse(response.isSuccessful());
+        test_suggestions(response.getSuggestedUsernames());
     }
 
 
@@ -122,22 +170,22 @@ public class DefaultUserServiceTest {
      * 
      */
     void test_suggestions(final List<String> suggestions) {
-	assertFalse(CollectionUtils.isEmpty(suggestions));
-	final int suggestionsSize = suggestions.size();
-	assertTrue(String.format("Should have from 5 up to 14 suggestions, but has %d",
-	        suggestionsSize), ((5 <= suggestionsSize) && (suggestionsSize <= 14)));
-	List<String> distinctSuggestions = suggestions.stream().distinct()
-	        .collect(Collectors.toList());
-	assertEquals("Suggestion should not have duplicates", suggestions.size(),
-	        distinctSuggestions.size());
-	for (String suggestion : suggestions) {
-	    assertTrue(String.format("Suggestion %s should have more than 6 chars, but has %d",
-	            suggestion, suggestion.length()), (6 <= suggestion.length()));
-	    try {
-		this.fixture.checkInvalidWords(suggestion);
-	    } catch (UserValidationException e) {
-		assertTrue("Suggested list should not have invalid words", Boolean.FALSE);
-	    }
-	}
+        assertFalse(CollectionUtils.isEmpty(suggestions));
+        final int suggestionsSize = suggestions.size();
+        assertTrue(String.format("Should have from 5 up to 14 suggestions, but has %d",
+                suggestionsSize), ((5 <= suggestionsSize) && (suggestionsSize <= 14)));
+        List<String> distinctSuggestions = suggestions.stream().distinct()
+                .collect(Collectors.toList());
+        assertEquals("Suggestion should not have duplicates", suggestions.size(),
+                distinctSuggestions.size());
+        for (String suggestion : suggestions) {
+            assertTrue(String.format("Suggestion %s should have more than 6 chars, but has %d",
+                    suggestion, suggestion.length()), (6 <= suggestion.length()));
+            try {
+                this.fixture.checkInvalidWords(suggestion);
+            } catch (UserValidationException e) {
+                assertTrue("Suggested list should not have invalid words", Boolean.FALSE);
+            }
+        }
     }
 }
