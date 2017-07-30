@@ -25,6 +25,8 @@ import com.learn.springboot.validusername.dto.UserResponseDTO;
 import com.learn.springboot.validusername.exceptions.UserValidationException;
 import com.learn.springboot.validusername.models.UserModel;
 import com.learn.springboot.validusername.repositories.UserRepository;
+import com.learn.springboot.validusername.strategies.RestrictedWordsStrategy;
+import com.learn.springboot.validusername.strategies.SuggestedWordsStrategy;
 import com.learn.springboot.validusername.validators.impl.UsernameValidator;
 
 /**
@@ -46,6 +48,10 @@ public class DefaultUserServiceTest {
     private DefaultWordSuggestionService wordSuggestionService;
     @Autowired
     private Environment environment;
+    @Autowired
+    private RestrictedWordsStrategy restrictedWordsStrategy;
+    @Autowired
+    private SuggestedWordsStrategy suggestedWordsStrategy;
     //
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -60,6 +66,8 @@ public class DefaultUserServiceTest {
         mockUser.setPk(1L);
         mockUser.setUsername("username");
         this.wordSuggestionService.setEnvironment(this.environment);
+        this.wordSuggestionService.setRestrictedWordsStrategy(restrictedWordsStrategy);
+        this.wordSuggestionService.setSuggestedWordsStrategy(suggestedWordsStrategy);
         this.fixture = new DefaultUserService();
         this.fixture.setWordSuggestionService(this.wordSuggestionService);
         this.fixture.setUserRepository(this.userRepository);
