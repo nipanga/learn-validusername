@@ -51,7 +51,7 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
      */
     public boolean isRestricted(final String input) {
         final Collection<String> restrictedWords = getRestrictedWordsStrategy().getWords();
-        return restrictedWords.contains(StringUtils.lowerCase(input));
+        return restrictedWords.stream().anyMatch(w -> StringUtils.containsIgnoreCase(input, w));
     }
 
 
@@ -70,7 +70,7 @@ public class DefaultWordSuggestionService implements WordSuggestionService {
             for (GenerateUsernameStrategy usernameStrategy : getGenerateUsernameStrategies()) {
                 String word = input;
                 if (isRestricted(input)) {
-                    word = getSuggestedWordsStrategy().getWord(null);
+                    word = getSuggestedWordsStrategy().getWord(input);
                 }
                 String username = usernameStrategy.generate(word);
                 if (!suggestions.contains(username)) {

@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.env.Environment;
@@ -59,6 +60,24 @@ public class GetFromFileRestrictedWordsStrategy implements RestrictedWordsStrate
         // Spring Boot has its caveats, unfortunately...
         return new BufferedReader(
                 new InputStreamReader(new ClassPathResource(filePath).getInputStream()));
+    }
+
+
+    /**
+     * Gets the restricted words inside input
+     * 
+     * @param input
+     *            the input to search for restricted words
+     * 
+     * @return list of restricted words inside input
+     */
+    @Override
+    public List<String> getRestrictedWords(String input) {
+        List<String> result = new ArrayList<>();
+        List<String> restrictedWords = new ArrayList<>(getWords());
+        restrictedWords.stream().filter(w -> StringUtils.containsIgnoreCase(input, w))
+                .collect(Collectors.toCollection(() -> result));
+        return result;
     }
 
 

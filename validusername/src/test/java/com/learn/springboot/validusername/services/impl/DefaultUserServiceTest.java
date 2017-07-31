@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,13 +46,13 @@ public class DefaultUserServiceTest {
     //
     @Autowired
     private UserRepository userRepository;
-    @Autowired
+    @Resource
     private DefaultWordSuggestionService wordSuggestionService;
-    @Autowired
+    @Resource
     private Environment environment;
-    @Autowired
+    @Resource(name = "getFromFileRestrictedWordsStrategy")
     private RestrictedWordsStrategy restrictedWordsStrategy;
-    @Autowired
+    @Resource(name = "basedOnInputSuggestedWordsStrategy")
     private SuggestedWordsStrategy suggestedWordsStrategy;
     //
     @Rule
@@ -168,6 +170,18 @@ public class DefaultUserServiceTest {
     @Test
     public void test_username_invalid_restrictedWords() {
         final String username = "invalidWord";
+        final UserResponseDTO response = fixture.isValidUsername(username);
+        assertFalse(response.isSuccessful());
+        test_suggestions(response.getSuggestedUsernames());
+    }
+
+
+    /**
+     * 
+     */
+    @Test
+    public void test_username_invalid_restrictedWords_contains() {
+        final String username = "sometinginvalidWordsomething";
         final UserResponseDTO response = fixture.isValidUsername(username);
         assertFalse(response.isSuccessful());
         test_suggestions(response.getSuggestedUsernames());
